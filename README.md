@@ -1,5 +1,6 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
+###
+what will be missing is envlocal with a JWT_SECRET and  MONGODB_URI u will need too attach a backend as this is necesseray too use the program 
 ## Getting Started
 
 First, run the development server:
