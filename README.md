@@ -2,6 +2,11 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 ###
 what will be missing is envlocal with a JWT_SECRET and  MONGODB_URI u will need too attach a backend as this is necesseray too use the program 
 ## Getting Started
+create a user via post request done either via thunder client or via postman but no offical account creation is supported 
+
+![loginpage](image.png)
+![experienceCreation](image-1.png)
+![Portfolio display](image-2.png)
 
 First, run the development server:
 
