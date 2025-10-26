@@ -4,18 +4,13 @@ import {
   PortfolioData,
 } from "../../../../../lib/portfolio";
 
-interface RouteParams {
-  params: {
-    username: string;
-  };
-}
-
 export async function GET(
   _req: Request,
-  { params }: RouteParams
+  { params }: { params: Promise<{ username: string }> }
 ): Promise<NextResponse<PortfolioData | { error: string }>> {
   try {
-    const portfolio = await getPortfolioByUsername(params.username);
+    const { username } = await params;
+    const portfolio = await getPortfolioByUsername(username);
 
     if (!portfolio) {
       return NextResponse.json({ error: "Portfolio not found" }, { status: 404 });

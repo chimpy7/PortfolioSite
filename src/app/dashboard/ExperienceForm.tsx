@@ -167,7 +167,7 @@ export default function ExperienceForm() {
                   className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white shadow-inner transition focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-300/40 placeholder:text-slate-500"
                 />
                 <p className="text-xs text-slate-400">
-                  Use "Present" if this experience is ongoing.
+                  Use &quot;Present&quot; if this experience is ongoing.
                 </p>
               </div>
             </div>
