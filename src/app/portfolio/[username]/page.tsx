@@ -9,15 +9,16 @@ import {
 export const revalidate = 0;
 
 interface PortfolioPageProps {
-  params: {
+  params: Promise<{
     username: string;
-  };
+  }>;
 }
 
 export async function generateMetadata(
   { params }: PortfolioPageProps
 ): Promise<Metadata> {
-  const portfolio = await getPortfolioByUsername(params.username);
+  const { username } = await params;
+  const portfolio = await getPortfolioByUsername(username);
 
   if (!portfolio) {
     return { title: "Portfolio not found" };
@@ -57,7 +58,8 @@ const renderExperienceCard = (
 );
 
 export default async function PortfolioPage({ params }: PortfolioPageProps) {
-  const portfolio = await getPortfolioByUsername(params.username);
+  const { username } = await params;
+  const portfolio = await getPortfolioByUsername(username);
 
   if (!portfolio) {
     notFound();

@@ -19,3 +19,5 @@ export async function POST(req: Request) {
   const newUser = await User.create(data); 
   return NextResponse.json(newUser, { status: 201 });
 }
+
+
