@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
+import { CreateUserSchema } from "../../../lib/myzodschema";
 
 const INITIAL_FORM = {
   name: "",
@@ -9,23 +10,46 @@ const INITIAL_FORM = {
   password: "",
 };
 
+const INITIAL_ERRORS = {
+  name: "",
+  email: "",
+  password: "",
+};
+
+type ErrorState = typeof INITIAL_ERRORS;
+
 export default function CreatePage() {
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-   const router = useRouter();
- 
+  const [errors, setErrors] = useState<ErrorState>(INITIAL_ERRORS);
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage(null);
+    setErrors(INITIAL_ERRORS);
+
+    const validation = CreateUserSchema.safeParse(formData);
+
+    if (!validation.success) {
+      const fieldErrors = validation.error.flatten().fieldErrors;
+      setErrors({
+        name: fieldErrors.name?.[0] ?? "",
+        email: fieldErrors.email?.[0] ?? "",
+        password: fieldErrors.password?.[0] ?? "",
+      });
+      setMessage("Please fix the highlighted fields.");
+      return;
+    }
+
     setLoading(true);
-    
 
     try {
       const res = await fetch("/api/createuser", {
@@ -44,9 +68,8 @@ export default function CreatePage() {
 
       setMessage("User created successfully!");
       setFormData(INITIAL_FORM);
+      setErrors(INITIAL_ERRORS);
       router.push("/");
-      
-      
     } catch (err) {
       const error =
         err instanceof Error ? err.message : "Failed to create user";
@@ -58,6 +81,12 @@ export default function CreatePage() {
 
   const isSuccess = message?.toLowerCase().includes("success");
 
+  const inputClasses = (hasError: boolean) =>
+    `w-full rounded-2xl border bg-slate-900/60 px-4 py-3 text-sm text-white shadow-inner focus:outline-none focus:ring-2 ${
+      hasError
+        ? "border-rose-400 focus:border-rose-400 focus:ring-rose-400/40"
+        : "border-white/10 focus:border-emerald-300 focus:ring-emerald-300/40"
+    }`;
 
   return (
     <main className="min-h-screen bg-slate-950 pb-20 pt-16 text-slate-100">
@@ -72,7 +101,8 @@ export default function CreatePage() {
                 Create a profile
               </h1>
               <p className="mt-2 text-sm text-slate-300">
-                Fill in the details below to add a new user record.
+                Passwords must include at least one uppercase letter, one lowercase letter,
+                one number, and be 6 or more characters. Names must be at least 2 characters.
               </p>
             </div>
           </header>
@@ -92,8 +122,15 @@ export default function CreatePage() {
                 onChange={handleChange}
                 placeholder="Jane Doe"
                 required
-                className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white shadow-inner focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-300/40"
+                aria-invalid={Boolean(errors.name)}
+                aria-describedby={errors.name ? "name-error" : undefined}
+                className={inputClasses(Boolean(errors.name))}
               />
+              {errors.name && (
+                <p id="name-error" className="text-xs font-medium text-rose-300">
+                  {errors.name}
+                </p>
+              )}
             </div>
 
             <div className="space-y-3">
@@ -111,8 +148,15 @@ export default function CreatePage() {
                 onChange={handleChange}
                 placeholder="jane@example.com"
                 required
-                className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white shadow-inner focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-300/40"
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? "email-error" : undefined}
+                className={inputClasses(Boolean(errors.email))}
               />
+              {errors.email && (
+                <p id="email-error" className="text-xs font-medium text-rose-300">
+                  {errors.email}
+                </p>
+              )}
             </div>
 
             <div className="space-y-3">
@@ -128,11 +172,21 @@ export default function CreatePage() {
                 type="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="••••••••"
+                placeholder="********"
                 required
                 minLength={6}
-                className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white shadow-inner focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-300/40"
+                aria-invalid={Boolean(errors.password)}
+                aria-describedby={errors.password ? "password-error" : undefined}
+                className={inputClasses(Boolean(errors.password))}
               />
+              {errors.password && (
+                <p
+                  id="password-error"
+                  className="text-xs font-medium text-rose-300"
+                >
+                  {errors.password}
+                </p>
+              )}
             </div>
 
             <button
