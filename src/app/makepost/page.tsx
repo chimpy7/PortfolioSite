@@ -20,7 +20,7 @@ export default function DashboardPage() {
     try {
       const res = await fetch("/api/dashboard", {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Accept": "application/json" },
       });
 
       if (!res.ok) throw new Error("Failed to fetch experiences");
@@ -47,7 +47,7 @@ export default function DashboardPage() {
             My experiences
           </span>
           <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
-            Aleksandar portfolio 
+            Welcome to your portfolio dashboard
           </h1>
           <p className="max-w-2xl text-sm text-slate-300 md:text-base">
             This is my current timeline of experiences, showcasing my journey

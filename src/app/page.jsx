@@ -44,7 +44,7 @@ export default function MyForm() {
                 Portfolio Control Room
               </p>
               <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                Welcome back, Aleks
+                Welcome back ! 
               </h1>
               <p className="text-sm text-white/70 sm:text-base">
                 Sign in to publish new case studies, refresh project writeups, and keep your personal brand sharp.
@@ -79,12 +79,12 @@ export default function MyForm() {
               </div>
 
               <div className="flex flex-col gap-2 text-left text-xs text-white/60 sm:flex-row sm:items-center sm:justify-between sm:text-sm">
-                <p>Authentication is encrypted end-to-end to keep your content safe.</p>
+                <p> Are you new here ?.</p>
                 <a
-                  href="/forgot-password"
+                  href="/create"
                   className="font-semibold text-white transition hover:text-white/70"
                 >
-                  Forgot password?
+                Create new user 
                 </a>
               </div>
 

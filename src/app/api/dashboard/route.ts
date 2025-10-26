@@ -88,3 +88,96 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
 }
+
+
+export async function PATCH (req: Request) {
+  await connectDB();
+  const data = await req.json();
+  const cookieStore = await cookies();
+  const token = cookieStore.get("DashboardToken")?.value;
+
+  if (!token) {
+    return NextResponse.json({ error: "No token provided" }, { status: 401 });
+  }
+
+  try {
+
+
+ 
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(process.env.JWT_SECRET!)
+    );
+    const userId = (payload as any).id;
+
+    const user = await User.findById(userId)
+    const { expId, updatedData } = data;
+    if (!expId || !updatedData) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+    const updatedExperience = await Experience.findByIdAndUpdate(
+      expId,
+      updatedData,
+      { new: true }
+    );
+
+    if (!updatedExperience) {
+      return NextResponse.json({ error: "Experience not found" }, { status: 404 });
+    }
+    
+    return NextResponse.json(
+      { message: "Experience updated successfully", experience: updatedExperience },
+      { status: 200 }
+    );
+
+  } catch (err) {
+    console.error("Error verifying token:", err);
+    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+  }   
+}
+
+export async function DELETE(req: Request) {
+  await connectDB();
+  const cookieStore = await cookies();
+  const token = cookieStore.get("DashboardToken")?.value;
+
+  if (!token) {
+    return NextResponse.json({ error: "No token provided" }, { status: 401 });
+  }
+
+  try {
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(process.env.JWT_SECRET!)
+    );
+    const userId = (payload as any).id;
+
+    const { expId } = await req.json();
+
+    if (!expId) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const experience = await Experience.findById(expId);
+
+    if (!experience) {
+      return NextResponse.json({ error: "Experience not found" }, { status: 404 });
+    }
+
+    await User.findByIdAndUpdate(userId, { $pull: { experience: expId } });
+    await Experience.findByIdAndDelete(expId);
+
+    return NextResponse.json(
+      { message: "Experience deleted successfully" },
+      { status: 200 }
+    );
+  } catch (err) {
+    console.error("Error deleting experience:", err);
+
+    if (err instanceof Error && err.message.includes("decode")) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    return NextResponse.json({ error: "Failed to delete experience" }, { status: 500 });
+  }
+}
